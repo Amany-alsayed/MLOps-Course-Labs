@@ -150,6 +150,8 @@ def train_logistic(max_iter,X_train, y_train):
             X_train, name="churn_prediction data"
         )
     mlflow.log_input(dataset, context="data")
+    joblib.dump(log_reg, "Logistic_model.pkl")
+    mlflow.log_artifact("logistic_model.pkl")
     return log_reg
 
 def train_random_forest(X_train, y_train):
@@ -186,6 +188,8 @@ def train_random_forest(X_train, y_train):
             X_train, name="churn_prediction data"
         )
     mlflow.log_input(dataset, context="data")
+    joblib.dump(log_forst, "Random_forest.pkl")
+    mlflow.log_artifact("Random_forest.pkl")
     return log_forst
 def train_svm(max_iter,X_train,y_train):
     """
@@ -219,6 +223,8 @@ def train_svm(max_iter,X_train,y_train):
             X_train, name="churn_prediction data"
         )
     mlflow.log_input(dataset, context="data")
+    joblib.dump(log_svm, "SVM_model.pkl")
+    mlflow.log_artifact("SVM_model.pkl")
     return log_svm
 
 def mlflow_logging(name):
@@ -227,6 +233,7 @@ def mlflow_logging(name):
         mlflow.set_tag("run_id", run_id)
         df = pd.read_csv("dataset/Churn_Modelling.csv")
         col_transf, X_train, X_test, y_train, y_test = preprocess(df)
+
 
         ### Log the max_iter parameter
         
@@ -246,7 +253,7 @@ def mlflow_logging(name):
         eval_df = X_test.copy()
         eval_df["Exited"] = y_test.values 
         eval_df["Predictions"] = y_pred
-
+        
         ### Log metrics after calculating them
         pd_dataset = mlflow.data.from_pandas(
             eval_df, predictions="Predictions", targets="Exited", name="churn Data Evaluation"

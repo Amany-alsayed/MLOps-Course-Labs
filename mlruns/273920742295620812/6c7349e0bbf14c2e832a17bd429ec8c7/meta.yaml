@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/273920742295620812/6c7349e0bbf14c2e832a17bd429ec8c7/artifacts
+end_time: 1747643458216
+entry_point_name: ''
+experiment_id: '273920742295620812'
+lifecycle_stage: active
+run_id: 6c7349e0bbf14c2e832a17bd429ec8c7
+run_name: Random_forest_model
+run_uuid: 6c7349e0bbf14c2e832a17bd429ec8c7
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1747643448101
+status: 3
+tags: []
+user_id: amany

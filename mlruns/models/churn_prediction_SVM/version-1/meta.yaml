@@ -1,8 +1,8 @@
 aliases: []
 creation_timestamp: 1747639298661
-current_stage: None
+current_stage: Production
 description: ''
-last_updated_timestamp: 1747639298661
+last_updated_timestamp: 1747640690049
 name: churn_prediction_SVM
 run_id: cd7583a3f9454014aeb184a7b12b887b
 run_link: ''
