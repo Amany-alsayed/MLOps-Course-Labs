@@ -36,8 +36,9 @@ mlflow ui
 
 Then, execute the training script from the src directory:
 
+```py
 python src/train.py
-
+```
 This will:
 - Preprocess and rebalance the dataset
 - Train and evaluate all three models
