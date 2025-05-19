@@ -3,12 +3,15 @@ This module contains functions to preprocess and train the model
 for bank consumer churn prediction.
 """
 
+from inspect import signature
+from mlflow.protos.service_pb2 import Dataset
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.utils import resample
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.compose import make_column_transformer
+import joblib
 from sklearn.preprocessing import OneHotEncoder,  StandardScaler
 from sklearn.metrics import (
     accuracy_score,
@@ -20,7 +23,7 @@ from sklearn.metrics import (
 )
 
 ### Import MLflow
-
+import mlflow
 def rebalance(data):
     """
     Resample data to keep balance between target classes.
@@ -87,7 +90,8 @@ def preprocess(df):
         "EstimatedSalary",
     ]
     data = df.loc[:, filter_feat]
-    data_bal = rebalance(data=data)
+    data=data.dropna()
+    data_bal = rebalance(data=data).reset_index(drop=True)
     X = data_bal.drop("Exited", axis=1)
     y = data_bal["Exited"]
 
@@ -107,11 +111,13 @@ def preprocess(df):
     X_test = pd.DataFrame(X_test, columns=col_transf.get_feature_names_out())
 
     # Log the transformer as an artifact
+    joblib.dump(col_transf, "column_transformer.pkl")
+    mlflow.log_artifact("column_transformer.pkl")
 
     return col_transf, X_train, X_test, y_train, y_test
 
 
-def train(X_train, y_train):
+def train_logistic(max_iter,X_train, y_train):
     """
     Train a logistic regression model.
 
@@ -122,53 +128,70 @@ def train(X_train, y_train):
     Returns:
         LogisticRegression: trained logistic regression model
     """
-    log_reg = LogisticRegression(max_iter=1000)
+    log_reg = LogisticRegression(max_iter=max_iter)
     log_reg.fit(X_train, y_train)
 
     ### Log the model with the input and output schema
     # Infer signature (input and output schema)
-
+    input_ex = X_train.head(5)
+    output_ex= log_reg.predict(input_ex)
+    signature=mlflow.models.infer_signature(input_ex,output_ex)
     # Log model
-
+    mlflow.sklearn.log_model(
+        log_reg,
+        artifact_path="logistic_regression_model", 
+        signature=signature,
+        input_example=input_ex
+        )
     ### Log the data
-
+    dataset = mlflow.data.from_pandas(
+            X_train, name="churn_prediction data"
+        )
+    mlflow.log_input(dataset, context="data")
     return log_reg
 
 
 def main():
     ### Set the tracking URI for MLflow
-
+    mlflow.set_tracking_uri('http://127.0.0.1:5000')
     ### Set the experiment name
-
-
+    mlflow.set_experiment("churn_prediction_experiment")
+    run_name='first run'
     ### Start a new run and leave all the main function code as part of the experiment
+    with mlflow.start_run(run_name=run_name) as run:
+        run_id = run.info.run_id
+        mlflow.set_tag("run_id", run_id)
+        df = pd.read_csv("dataset/Churn_Modelling.csv")
+        col_transf, X_train, X_test, y_train, y_test = preprocess(df)
 
-    df = pd.read_csv("data/Churn_Modelling.csv")
-    col_transf, X_train, X_test, y_train, y_test = preprocess(df)
+        ### Log the max_iter parameter
+        max_iter=1000
+        mlflow.log_param('max_iter',max_iter)
 
-    ### Log the max_iter parameter
+        model= train_logistic(max_iter,X_train, y_train)
 
-    model = train(X_train, y_train)
+        
+        y_pred = model.predict(X_test)
+        eval_df = X_test.copy()
+        eval_df["Exited"] = y_test.values 
+        eval_df["Predictions"] = y_pred
 
-    
-    y_pred = model.predict(X_test)
-
-    ### Log metrics after calculating them
-
-
-    ### Log tag
-
-
-    
-    conf_mat = confusion_matrix(y_test, y_pred, labels=model.classes_)
-    conf_mat_disp = ConfusionMatrixDisplay(
-        confusion_matrix=conf_mat, display_labels=model.classes_
-    )
-    conf_mat_disp.plot()
-    
-    # Log the image as an artifact in MLflow
-    
-    plt.show()
+        ### Log metrics after calculating them
+        pd_dataset = mlflow.data.from_pandas(
+            eval_df, predictions="Predictions", targets="Exited", name="churn Data Evaluation"
+        )
+        result=mlflow.evaluate(data=pd_dataset, predictions=None, model_type="classifier")
+        ### Log tag
+        conf_mat = confusion_matrix(y_test, y_pred, labels=model.classes_)
+        conf_mat_disp = ConfusionMatrixDisplay(
+            confusion_matrix=conf_mat, display_labels=model.classes_
+        )
+        conf_mat_disp.plot()
+        
+        # Log the image as an artifact in MLflow
+        plt.savefig("confusion_matrix.png")
+        mlflow.log_artifact("confusion_matrix.png")
+        plt.show()
 
 
 if __name__ == "__main__":

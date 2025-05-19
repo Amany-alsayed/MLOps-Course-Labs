@@ -1,0 +1,16 @@
+artifact_uri: mlflow-artifacts:/273920742295620812/2e8743b26b2646599908ae464598123a/artifacts
+deleted_time: 1747572824161
+end_time: 1747572646094
+entry_point_name: ''
+experiment_id: '273920742295620812'
+lifecycle_stage: deleted
+run_id: 2e8743b26b2646599908ae464598123a
+run_name: first run
+run_uuid: 2e8743b26b2646599908ae464598123a
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1747572640874
+status: 4
+tags: []
+user_id: amany
