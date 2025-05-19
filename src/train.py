@@ -2,14 +2,15 @@
 This module contains functions to preprocess and train the model
 for bank consumer churn prediction.
 """
-
-from inspect import signature
 from mlflow.protos.service_pb2 import Dataset
+from numpy.random.mtrand import logistic
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.utils import resample
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+from sklearn import svm
 from sklearn.compose import make_column_transformer
 import joblib
 from sklearn.preprocessing import OneHotEncoder,  StandardScaler
@@ -122,6 +123,7 @@ def train_logistic(max_iter,X_train, y_train):
     Train a logistic regression model.
 
     Args:
+        max_iter : number of iterations
         X_train (pd.DataFrame): DataFrame with features
         y_train (pd.Series): Series with target
 
@@ -150,27 +152,96 @@ def train_logistic(max_iter,X_train, y_train):
     mlflow.log_input(dataset, context="data")
     return log_reg
 
+def train_random_forest(X_train, y_train):
+    """
+    Train a random_forest model.
 
-def main():
-    ### Set the tracking URI for MLflow
-    mlflow.set_tracking_uri('http://127.0.0.1:5000')
-    ### Set the experiment name
-    mlflow.set_experiment("churn_prediction_experiment")
-    run_name='first run'
-    ### Start a new run and leave all the main function code as part of the experiment
-    with mlflow.start_run(run_name=run_name) as run:
+    Args:
+        X_train (pd.DataFrame): DataFrame with features
+        y_train (pd.Series): Series with target
+
+    Returns:
+        RandomForest: trined random_forest model 
+    """
+    estimtors=200
+    mlflow.log_param("n_estimators",estimtors)
+    log_forst = RandomForestClassifier(n_estimators=estimtors)
+
+    log_forst.fit(X_train, y_train)
+
+    ### Log the model with the input and output schema
+    # Infer signature (input and output schema)
+    input_ex = X_train.head(5)
+    output_ex= log_forst.predict(input_ex)
+    signature=mlflow.models.infer_signature(input_ex,output_ex)
+    # Log model
+    mlflow.sklearn.log_model(
+        log_forst,
+        artifact_path="random_forest_model", 
+        signature=signature,
+        input_example=input_ex
+        )
+    ### Log the data
+    dataset = mlflow.data.from_pandas(
+            X_train, name="churn_prediction data"
+        )
+    mlflow.log_input(dataset, context="data")
+    return log_forst
+def train_svm(max_iter,X_train,y_train):
+    """
+    Train a SVM model.
+
+    Args:
+        max_iter : number of iterations
+        X_train (pd.DataFrame): DataFrame with features
+        y_train (pd.Series): Series with target
+
+    Returns:
+        SVM: trined SVM model 
+    """
+    log_svm = svm.SVC(max_iter=max_iter)
+    log_svm.fit(X_train, y_train)
+
+    ### Log the model with the input and output schema
+    # Infer signature (input and output schema)
+    input_ex = X_train.head(5)
+    output_ex= log_svm.predict(input_ex)
+    signature=mlflow.models.infer_signature(input_ex,output_ex)
+    # Log model
+    mlflow.sklearn.log_model(
+        log_svm,
+        artifact_path="SVM_model", 
+        signature=signature,
+        input_example=input_ex
+        )
+    ### Log the data
+    dataset = mlflow.data.from_pandas(
+            X_train, name="churn_prediction data"
+        )
+    mlflow.log_input(dataset, context="data")
+    return log_svm
+
+def mlflow_logging(name):
+    with mlflow.start_run(run_name=name) as run:
         run_id = run.info.run_id
         mlflow.set_tag("run_id", run_id)
         df = pd.read_csv("dataset/Churn_Modelling.csv")
         col_transf, X_train, X_test, y_train, y_test = preprocess(df)
 
         ### Log the max_iter parameter
-        max_iter=1000
-        mlflow.log_param('max_iter',max_iter)
-
-        model= train_logistic(max_iter,X_train, y_train)
-
         
+        if name=="logistic_model":
+            max_iter=1000
+            mlflow.log_param('max_iter',max_iter)
+            model=train_logistic(max_iter,X_train,y_train)
+        elif name=="Random_forest_model":
+            model=train_random_forest(X_train,y_train) 
+        elif name=="SVM_model":
+            max_iter=1000
+            mlflow.log_param('max_iter',max_iter)
+            model=train_svm(max_iter,X_train,y_train)
+        
+        mlflow.set_tag("model_name",name)
         y_pred = model.predict(X_test)
         eval_df = X_test.copy()
         eval_df["Exited"] = y_test.values 
@@ -192,6 +263,15 @@ def main():
         plt.savefig("confusion_matrix.png")
         mlflow.log_artifact("confusion_matrix.png")
         plt.show()
+
+def main():
+    ### Set the tracking URI for MLflow
+    mlflow.set_tracking_uri('http://127.0.0.1:5000')
+    ### Set the experiment name
+    mlflow.set_experiment("churn_prediction_experiment")
+    mlflow_logging("logistic_model")
+    mlflow_logging("Random_forest_model")
+    mlflow_logging("SVM_model")
 
 
 if __name__ == "__main__":

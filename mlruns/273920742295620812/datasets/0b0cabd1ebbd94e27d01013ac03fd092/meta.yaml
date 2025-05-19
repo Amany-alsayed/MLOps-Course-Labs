@@ -1,0 +1,18 @@
+digest: eabb2c02
+name: churn Data Evaluation
+profile: '{"num_rows": 1223, "num_elements": 15899}'
+schema: '{"mlflow_colspec": [{"type": "double", "name": "standardscaler__CreditScore",
+  "required": true}, {"type": "double", "name": "standardscaler__Age", "required":
+  true}, {"type": "double", "name": "standardscaler__Tenure", "required": true}, {"type":
+  "double", "name": "standardscaler__Balance", "required": true}, {"type": "double",
+  "name": "standardscaler__NumOfProducts", "required": true}, {"type": "double", "name":
+  "standardscaler__HasCrCard", "required": true}, {"type": "double", "name": "standardscaler__IsActiveMember",
+  "required": true}, {"type": "double", "name": "standardscaler__EstimatedSalary",
+  "required": true}, {"type": "double", "name": "onehotencoder__Geography_Germany",
+  "required": true}, {"type": "double", "name": "onehotencoder__Geography_Spain",
+  "required": true}, {"type": "double", "name": "onehotencoder__Gender_Male", "required":
+  true}, {"type": "long", "name": "Exited", "required": true}, {"type": "long", "name":
+  "Predictions", "required": true}]}'
+source: '{"tags": {"mlflow.user": "amany", "mlflow.source.name": "src/train.py", "mlflow.source.type":
+  "LOCAL", "mlflow.source.git.commit": "664a494ac874a3d6d3acb719bc68cd5c5aaf0425"}}'
+source_type: code
