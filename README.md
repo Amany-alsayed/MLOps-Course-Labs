@@ -11,7 +11,7 @@ It uses MLflow to:
 - Save preprocessing pipelines
 - Store evaluation artifacts like confusion matrices
 
-📦 Requirements
+### 📦 Requirements
 
 Install the required Python libraries using:
 
@@ -28,7 +28,7 @@ project_root/
 └── src/
     └── train.py
 
-🚀 Running the Project
+### 🚀 Running the Project
 
 Make sure the MLflow tracking server is running locally:
 
@@ -43,7 +43,7 @@ This will:
 - Train and evaluate all three models
 - Log experiments, metrics, and artifacts to MLflow
 
-📊 Viewing Results
+### 📊 Viewing Results
 
 Once the script finishes:
 1. Open your browser and go to: http://127.0.0.1:5000
