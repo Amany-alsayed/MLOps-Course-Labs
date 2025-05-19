@@ -15,7 +15,7 @@ It uses MLflow to:
 
 Install the required Python libraries using:
 
-pip install -r requirements.txt
+>>> pip install -r requirements.txt
 
 📁 Dataset
 
@@ -32,13 +32,13 @@ project_root/
 
 Make sure the MLflow tracking server is running locally:
 
-mlflow ui
+>>> mlflow ui
 
 Then, execute the training script from the src directory:
 
-```py
-python src/train.py
-```
+
+>>> python src/train.py
+
 This will:
 - Preprocess and rebalance the dataset
 - Train and evaluate all three models
