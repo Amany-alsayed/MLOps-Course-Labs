@@ -1,0 +1,5 @@
+{
+    "python.analysis.extraPaths": [
+        "./churn_prediction/Lib/site-packages"
+    ]
+}
