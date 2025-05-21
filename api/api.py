@@ -7,6 +7,7 @@ import uvicorn
 from typing import Union
 import pandas as pd
 
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
@@ -34,7 +35,7 @@ app=FastAPI()
 class PredictRequest(BaseModel):
     features:list[Union[str, float, int]]
 
-
+Instrumentator().instrument(app).expose(app)
 @app.get("/")
 async def home():
     logger.info("Home endpoint accessed.")
