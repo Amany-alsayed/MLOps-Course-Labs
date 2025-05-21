@@ -10,20 +10,20 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
     handlers=[
-        logging.FileHandler("app.log"),
+        logging.FileHandler(r"api\app.log"),
         logging.StreamHandler()
     ]
 )
 logger=logging.getLogger(__name__)
 try:
-    model=joblib.load("SVM_model.pkl")
+    model=joblib.load(r"api\SVM_model.pkl")
     logger.info("model loaded successfully.")
 except Exception as e:
     logger.error(f"failed to load model {e}")
     model=None
 
 try:
-    preprocess=joblib.load("column_transformer.pkl")
+    preprocess=joblib.load(r"api\column_transformer.pkl")
     logger.info("preprocessing file loaded successfully.")
 except Exception as e:
     logger.error(f"failed to load preprosessing file {e}")
