@@ -1,6 +1,7 @@
 import logging
 from fastapi import FastAPI, Request, HTTPException
 from pydantic import BaseModel
+from prometheus_fastapi_instrumentator import Instrumentator
 import joblib
 import uvicorn
 from typing import Union
