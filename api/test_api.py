@@ -16,6 +16,7 @@ def test_health():
     assert response.status_code == 200
     json_resp = response.json()
     assert "status" in json_resp
-    assert json_resp["status"] in ["healthy", "model_not_loaded"]
+    assert json_resp["status"] in ["healthy", "model not loaded"]
+
 
 
