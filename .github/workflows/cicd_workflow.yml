@@ -49,4 +49,21 @@ jobs:
           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
           docker tag ml-churn-prediction:amany217 ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/churn-prediction:amany217
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/churn-prediction:amany217    
- 
+     - name: clone repo and Deploy to EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }} 
+          username: ${{ secrets.EC2_USERNAME }} 
+          key: ${{ secrets.EC2_SSH_KEY }}  
+          script: |
+            mkdir amany
+            cd amany
+            if [ -d "MLOps-Course-Labs" ]; then
+              cd MLOps-Course-Labs && git pull
+            else
+              git clone https://github.com/Amany-alsayed/MLOps-Course-Labs.git
+              cd MLOps-Course-Labs
+            fi
+            aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+            docker compose up -d
+            

@@ -1,9 +1,9 @@
 services:
   fastapi:
-    build: ./api
+    image: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/churn-prediction:amany217
     container_name: fastapi
     ports:
-      - "8000:8000"
+      - "443:8000"
   prometheus:
     image: prom/prometheus:latest
     ports:
