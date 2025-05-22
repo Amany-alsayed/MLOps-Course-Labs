@@ -6,4 +6,7 @@ psutil==5.9.0
 scikit-learn==1.6.1
 scipy==1.15.2
 prometheus_fastapi_instrumentator
+fastapi
+uvicorn
+httpx
 pytest
