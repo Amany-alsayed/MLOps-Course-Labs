@@ -28,4 +28,9 @@ jobs:
           cd api
           pytest 
 
-    
+      - name: Build Docker Image
+        run: |
+          cd api
+          docker build -t ml-model-service:latest . 
+
+      
