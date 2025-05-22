@@ -1,6 +1,6 @@
 services:
   fastapi:
-    image: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/churn-prediction:amany217
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/churn-prediction:amany217
     container_name: fastapi
     ports:
       - "443:8000"

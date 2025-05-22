@@ -65,6 +65,9 @@ jobs:
               git clone https://github.com/Amany-alsayed/MLOps-Course-Labs.git
               cd MLOps-Course-Labs
             fi
+            export AWS_ACCOUNT_ID=${{ secrets.AWS_ACCOUNT_ID }}
+            export AWS_REGION=${{ secrets.AWS_REGION }}
             aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+            docker compose down --rmi 'all'
             docker compose pull
             docker compose up -d
