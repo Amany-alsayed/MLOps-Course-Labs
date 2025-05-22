@@ -50,24 +50,15 @@ jobs:
           docker tag ml-churn-prediction:amany217 ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/churn-prediction:amany217
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/churn-prediction:amany217
 
-      - name: Clone Repo and Deploy to EC2
+      - name: Deploy to EC2
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            mkdir -p amany
-            cd amany
-            if [ -d "MLOps-Course-Labs" ]; then
-              cd MLOps-Course-Labs && git pull
-            else
-              git clone https://github.com/Amany-alsayed/MLOps-Course-Labs.git
-              cd MLOps-Course-Labs
-            fi
-            export AWS_ACCOUNT_ID=${{ secrets.AWS_ACCOUNT_ID }}
-            export AWS_REGION=${{ secrets.AWS_REGION }}
             aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
-            docker compose down --rmi 'all'
-            docker compose pull
-            docker compose up -d
+            docker pull ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/churn-prediction:amany217
+            docker stop churn-prediction || true # In case the container doesn't exist yet
+            docker rm churn-prediction || true
+            docker run -d -p 80:8005 --name churn-prediction ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/churn-prediction:amany217
