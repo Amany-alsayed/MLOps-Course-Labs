@@ -61,4 +61,4 @@ jobs:
             docker pull ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/churn-prediction:amany217
             docker stop churn-prediction || true # In case the container doesn't exist yet
             docker rm churn-prediction || true
-            docker run -d -p 80:8005 --name churn-prediction ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/churn-prediction:amany217
+            docker run -d -p 80:8000 --name churn-prediction ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/churn-prediction:amany217
